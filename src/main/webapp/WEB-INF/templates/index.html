@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Document</title>
+  </head>
+  <body>
+    <h1>index</h1>
+    <div>
+      <a th:href="@{/user}">show users</a>
+    </div>
+
+    <hr />
+
+    <h2>create user</h2>
+    <form th:action="@{/user}" method="POST">
+      name: <input type="text" name="name" />
+      <br />
+      password: <input type="password" name="password" />
+      <br />
+      address: <input type="text" name="address" />
+      <br />
+      phone: <input type="text" name="phone" /> <br />
+      <button type="submit">submit</button>
+    </form>
+    <hr />
+  </body>
+</html>

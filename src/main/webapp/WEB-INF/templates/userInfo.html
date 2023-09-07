@@ -1,0 +1,133 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Document</title>
+  </head>
+
+  <body>
+    <h1>User Info</h1>
+
+    <div id="userPanel" th:if="${name}">
+      <a th:href="@{/user}">back</a>
+      <p>id: <span th:text="${id}"></span></p>
+      <p>
+        name:
+        <input v-if="isEditing" type="text" v-model="editTemp.name" />
+        <span
+          v-else
+          th:text="${name}"
+          @vue:mounted="editTemp.name = $el.innerText"
+        ></span>
+      </p>
+      <p>
+        password:
+        <input v-if="isEditing" type="text" v-model="editTemp.password" />
+        <span
+          v-else
+          th:text="${password}"
+          @vue:mounted="editTemp.password = $el.innerText"
+        ></span>
+      </p>
+      <p>
+        address:
+        <input v-if="isEditing" type="text" v-model="editTemp.address" />
+        <span
+          v-else
+          th:text="${address}"
+          @vue:mounted="editTemp.address = $el.innerText"
+        ></span>
+      </p>
+      <p>
+        phone:
+        <input v-if="isEditing" type="text" v-model="editTemp.phone" />
+        <span
+          v-else
+          th:text="${phone}"
+          @vue:mounted="editTemp.phone = $el.innerText"
+        ></span>
+      </p>
+
+      <div>
+        <button
+          @click="deleteUser($el)"
+          th:data-url="@{'/user/' + ${id}}"
+          data-method="DELETE"
+        >
+          delete
+        </button>
+        <button @click="editUser">edit</button>
+        <button
+          v-if="isEditing"
+          @click="save($el)"
+          th:data-url="@{'/user/' + ${id}}"
+          th:data-method="PUT"
+        >
+          save
+        </button>
+      </div>
+    </div>
+
+    <form id="httpMethodForm" method="POST">
+      <input type="hidden" name="_method" />
+    </form>
+
+    <div th:unless="${#lists.isEmpty(userList)}" th:each="user : ${userList}">
+      <p>id: <span th:text="${user.id}"></span></p>
+      <p>
+        name: <a th:text="${user.name}" th:href="@{'/user/' + ${user.id}}"></a>
+      </p>
+      <p>password: <span th:text="${user.password}"></span></p>
+      <p>address: <span th:text="${user.address}"></span></p>
+      <p>phone: <span th:text="${user.phone}"></span></p>
+      <hr />
+    </div>
+
+    <script src="https://unpkg.com/petite-vue"></script>
+    <script>
+      const sendRequest = (url, method, args) => {
+        const httpMethodForm = document.querySelector('#httpMethodForm');
+        httpMethodForm.action = url;
+        httpMethodForm.children[0].value = method;
+
+        if (args) {
+          const argKeys = Object.keys(args);
+
+          argKeys.forEach(key => {
+            const inputEl = document.createElement('input');
+            inputEl.type = 'hidden';
+            inputEl.name = key;
+            inputEl.value = args[key];
+            httpMethodForm.append(inputEl);
+          });
+        }
+
+        httpMethodForm.submit();
+      };
+
+      PetiteVue.createApp({
+        isEditing: false,
+        editTemp: {
+          name: '',
+          password: '',
+          address: '',
+          phone: ''
+        },
+        deleteUser($el) {
+          const url = $el.dataset.url;
+          const method = $el.dataset.method;
+          sendRequest(url, method);
+        },
+        editUser() {
+          this.isEditing = !this.isEditing;
+        },
+        save($el) {
+          const url = $el.dataset.url;
+          const method = $el.dataset.method;
+          sendRequest(url, method, this.editTemp);
+        }
+      }).mount('#userPanel');
+    </script>
+  </body>
+</html>
